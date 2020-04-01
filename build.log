@@ -1,0 +1,1 @@
+gcc -g -Wall socket_facade.h socket_facade.c server.c openssl_facade.h openssl_facade.c -o server.o -I. -I/home/pi/Desktop/WFH/openssl-1.1.1d_install/include -lssl -lcrypto -L/home/pi/Desktop/WFH/openssl-1.1.1d_install/lib -L.

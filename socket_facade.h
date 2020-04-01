@@ -5,16 +5,26 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#define PORT 4433
+#include "error.h"
 
-enum {
-    OK = 0,
-    ERROR_CANNOT_CREATE_SOCKET = -1,
-    ERROR_CANNOT_BIND_PORT = -2,
-    ERROR_LISTEN
-} RETURN_CODE;
+#define PORT 443
 
+
+
+//======================================================
+//newsocket(int port)
+//params:
+//    PORT - Port number to use when creating new socket
+//return:
+//   socket file descriptor on success
+//    ERROR_CANNOT_CREATE_SOCKET
+//    ERROR_CANNOT_BIND_PORT
+//    ERROR_LISTEN
+//    NULL
+//=======================================================
 
 int newsocket();
+
+int socket_accept(int, struct sockaddr_in, uint);
 
 

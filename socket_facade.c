@@ -36,3 +36,17 @@ int newsocket(){
     }
     return sockfd;   
 }
+
+//======================================================
+//socket_accept(int socket, struct sockaddr_in addr, uint size)
+//params:
+//    socket - socket file descriptor
+//    addr - structure for holding address family, port, etc
+//    size - structure size in memory
+//return:
+//   sockfd (int)
+//=======================================================
+
+int socket_accept(int socket, struct sockaddr_in addr, uint size){
+   return accept(socket, (struct sockaddr *)&addr, &size);
+}
