@@ -1,51 +1,57 @@
 
-#include "socket_facade.h"
-#include "openssl_facade.h"
+#include "socket_proxy.h"
+#include "openssl_proxy.h"
+
 #define BUFFER 1024
+
 int main(){
     int socket;
     SSL_CTX *sslctx;
 
+    //initialize and configure context
     openssl_init();
     sslctx = openssl_create_context();
     openssl_configure_context(sslctx);
 
+    //create server socket for listening at port 443
     socket = newsocket();
 
+    //process all incoming client connection request
     while(1){
+        //necessary variable/structure declarations
         struct sockaddr_in addr;
         uint size = sizeof(addr);
         SSL *myssl;
-        char client_message[BUFFER] = {0};
         char server_message[] = "HTTP/1.1 200 OK\r\n\r\n<h1>SD15 Network Team!</h1>\r\n\r\n";
 
+        //accept incoming client connection and get client socket
         int clientsocket = socket_accept(socket, addr, size);
         if(clientsocket < 0){
             perror("Error accepting connection! \n");
-            exit(ERROR_ACCEPT_CONNECTION);
+            return ERROR_ACCEPT_CONNECTION;
         }
-               
-        
-        myssl = SSL_new(sslctx);
-        SSL_set_fd(myssl, clientsocket);
 
-    
+        //create new SSL connection
+        myssl = openssl_new_connection(sslctx, clientsocket);
 
-        if(SSL_accept(myssl) <= 0){
-            ERR_print_errors_fp(stderr);
-        } else {
-            SSL_read(myssl, client_message, strlen(client_message));
-            printf("Client message: %s\n", client_message);
-            SSL_write(myssl, server_message, strlen(server_message));
+        if(myssl == NULL){
+            return ERROR_OPENSSL_NEW_CONNECTION;
         }
-        SSL_shutdown(myssl);
-        SSL_free(myssl);
-        close(clientsocket);
+
+        //accept new SSL connection
+        if(!(openssl_accept_connection(myssl) <= OK)){
+            openssl_write(myssl, server_message, strlen(server_message));
+        }
+
+        //clean current session and close client socket
+        openssl_clean_session(myssl);
+        socket_close(clientsocket);
     }
 
-    close(socket);
-    SSL_CTX_free(sslctx);
+    //terminate server side connection/socket and cleanup OPENSSL memory
+    openssl_clean_connection(sslctx);   
     openssl_cleanEVP();
+    socket_close(socket);
     
 
 

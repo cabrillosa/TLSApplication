@@ -1,4 +1,4 @@
-#include "socket_facade.h"
+#include "socket_proxy.h"
 
 //======================================================
 //newsocket(int port)
@@ -48,5 +48,17 @@ int newsocket(){
 //=======================================================
 
 int socket_accept(int socket, struct sockaddr_in addr, uint size){
+    //TODO: Perform error handling
    return accept(socket, (struct sockaddr *)&addr, &size);
+}
+
+//======================================================
+//socket_close(int sockfd)
+//params:
+//    sockfd - socket file descriptor
+//return:
+//   void
+//=======================================================
+void socket_close(int sockfd){
+    close(sockfd);
 }
