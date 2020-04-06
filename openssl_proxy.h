@@ -30,7 +30,9 @@ void openssl_cleanEVP();
 //return:
 //    SSL_CTX
 //=======================================================
-SSL_CTX *openssl_create_context();
+SSL_CTX *openssl_create_server_context();
+
+SSL_CTX *openssl_create_client_context();
 
 
 //======================================================
@@ -52,6 +54,14 @@ void openssl_configure_context(SSL_CTX*);
 //    SSL* pointer to the newly configured SSL connection
 //=============================================================================/
 SSL *openssl_new_connection(SSL_CTX*, int);
+
+void openssl_show_certificate(SSL *ssl);
+
+
+int openssl_client_connect(SSL *ssl);
+
+int openssl_read(SSL* myssl, char* server_message, int len);
+
 
 //=============================================================================/
 //openssl_accept_connection(SSL* myssl)

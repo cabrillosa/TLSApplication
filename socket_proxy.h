@@ -4,6 +4,10 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <errno.h>
+#include <malloc.h>
+#include <resolv.h>
+#include <netdb.h>
 
 #include "error.h"
 
@@ -23,7 +27,10 @@
 //    NULL
 //=======================================================
 
-int newsocket();
+int socket_new_server();
+
+
+int socket_new_client(const char *hostname, int port);
 
 //======================================================
 //socket_accept(int socket, struct sockaddr_in addr, uint size)

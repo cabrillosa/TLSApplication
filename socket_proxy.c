@@ -12,7 +12,7 @@
 //    NULL
 //=======================================================
 
-int newsocket(){
+int socket_new_server(){
     int sockfd;
     struct sockaddr_in addr;
 
@@ -35,6 +35,30 @@ int newsocket(){
         exit(ERROR_LISTEN);
     }
     return sockfd;   
+}
+
+int socket_new_client(const char *hostname, int port){
+    int sockfd;
+    struct hostent *host;
+    struct sockaddr_in addr;
+
+    if((host = gethostbyname(hostname)) == NULL){
+        perror("unable to resolve hostname!\n");
+        exit(ERROR_CANNOT_RESOLVE_HOSTNAME);
+    }
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    bzero(&addr, sizeof(addr));
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(port);
+    addr.sin_addr.s_addr = *(long *)(host->h_addr);
+    if(connect(sockfd,(struct sockaddr *)&addr, sizeof(addr)) != 0){
+        close(sockfd);
+        perror("Error connecting to server!\n");
+        exit(ERROR_CANNOT_CONNECT_SERVER);
+    }
+    return sockfd;
 }
 
 //======================================================

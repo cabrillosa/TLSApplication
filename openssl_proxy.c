@@ -9,6 +9,8 @@
 //    none
 //=======================================================
 void openssl_init(){
+
+    SSL_library_init();
     SSL_load_error_strings();
     OpenSSL_add_ssl_algorithms();
 
@@ -34,11 +36,27 @@ void openssl_cleanEVP(){
 //return:
 //    SSL_CTX
 //=======================================================
-SSL_CTX *openssl_create_context(){
+SSL_CTX *openssl_create_server_context(){
     const SSL_METHOD *meth;
     SSL_CTX *ctx;
 
     meth = SSLv23_server_method();
+    
+    ctx = SSL_CTX_new(meth);
+
+    if(!ctx){
+        perror("unable to create new context!\n");
+        ERR_print_errors_fp(stderr);
+        exit(ERROR_OPENSSL_CREATE_CTX);
+    }
+    return ctx;
+}
+
+SSL_CTX *openssl_create_client_context(){
+    const SSL_METHOD *meth;
+    SSL_CTX *ctx;
+
+    meth = SSLv23_client_method();
     
     ctx = SSL_CTX_new(meth);
 
@@ -111,6 +129,39 @@ int openssl_accept_connection(SSL* myssl){
     return result;
 }
 
+//========================
+void openssl_show_certificate(SSL *ssl){
+    X509 *cert;
+    char *part;
+
+    //get server certificate
+    cert = SSL_get_peer_certificate(ssl);
+
+    if(cert != NULL){
+        printf("Server side Certificate information:\n");
+        part = X509_NAME_oneline(X509_get_subject_name(cert),0,0);
+        printf("SUbj: %s\n", part);
+          part = X509_NAME_oneline(X509_get_issuer_name(cert),0,0);
+        printf("CA: %s\n", part);
+        free(part);
+        X509_free(cert);
+    } else {
+        printf("No Certificate issued!\n");
+    }
+}
+
+
+//================================
+int openssl_client_connect(SSL *ssl){
+    int result = SSL_connect(ssl);
+    if(result == -1){
+        ERR_print_errors_fp(stderr);
+    }
+    return result;
+}
+
+
+
 //=============================================================================/
 //openssl_write(SSL* myssl, char* server_message, int len)
 //    compose buffer, perform PKES, and send the encrypted data to the client
@@ -122,6 +173,10 @@ int openssl_accept_connection(SSL* myssl){
 //=============================================================================/
 void openssl_write(SSL* myssl, char* server_message, int len){
     SSL_write(myssl, server_message, len);
+}
+
+int openssl_read(SSL* myssl, char* server_message, int len){
+    return SSL_read(myssl, server_message, len);
 }
 
 //=============================================================================/

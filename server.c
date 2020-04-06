@@ -10,11 +10,11 @@ int main(){
 
     //initialize and configure context
     openssl_init();
-    sslctx = openssl_create_context();
+    sslctx = openssl_create_server_context();
     openssl_configure_context(sslctx);
 
     //create server socket for listening at port 443
-    socket = newsocket();
+    socket = socket_new_server();
 
     //process all incoming client connection request
     while(1){
