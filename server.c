@@ -22,6 +22,7 @@ int main(){
         struct sockaddr_in addr;
         uint size = sizeof(addr);
         SSL *myssl;
+        char client_message[BUFFER] = {0};
         char server_message[] = "HTTP/1.1 200 OK\r\n\r\n<h1>SD15 Network Team!</h1>\r\n\r\n";
 
         //accept incoming client connection and get client socket
@@ -40,6 +41,11 @@ int main(){
 
         //accept new SSL connection
         if(!(openssl_accept_connection(myssl) <= OK)){
+            //read client request
+            openssl_read(myssl, client_message, BUFFER);
+            printf("client request: %s\n", client_message);
+            
+            //send response to client
             openssl_write(myssl, server_message, strlen(server_message));
         }
 

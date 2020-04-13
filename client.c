@@ -5,7 +5,7 @@
 
 int main(){
 
-    int serversocket, receivebytes;
+    int serversocket;
     SSL *myssl;
     char server_reply_buffer[BUFFER] = {0};
     char *clientreq_buffer = "GET / HTTP/1.1\r\n\r\n";
@@ -16,15 +16,19 @@ int main(){
     openssl_init();
     sslctx = openssl_create_client_context();
 
-    serversocket = socket_new_client("uc.edu.ph",443); 
+    serversocket = socket_new_client("localhost",443); 
 
     myssl = openssl_new_connection(sslctx, serversocket);
 
     if(openssl_client_connect(myssl) != -1){
+        //show server certificate information
         openssl_show_certificate(myssl);
-        openssl_write(myssl, clientreq_buffer, strlen(clientreq_buffer));
-        receivebytes = openssl_read(myssl, server_reply_buffer, BUFFER);
-        printf("recv bytes: %d\n", receivebytes);
+
+        //send HTTP GET request to the server
+        openssl_write(myssl, clientreq_buffer, strlen(clientreq_buffer));  
+
+        //get server response
+        openssl_read(myssl, server_reply_buffer, BUFFER);
         server_reply_buffer[receivebytes] = 0;
         printf("Server reply: %s\n", server_reply_buffer);
 
