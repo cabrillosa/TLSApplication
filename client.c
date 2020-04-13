@@ -29,7 +29,7 @@ int main(){
 
         //get server response
         openssl_read(myssl, server_reply_buffer, BUFFER);
-        server_reply_buffer[receivebytes] = 0;
+        
         printf("Server reply: %s\n", server_reply_buffer);
 
     }
